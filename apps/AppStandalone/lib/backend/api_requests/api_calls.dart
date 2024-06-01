@@ -95,6 +95,21 @@ Future<String> executeGptPrompt(String? prompt) async {
   return response;
 }
 
+Future<String> executeGpt40Prompt(String? prompt) async {
+  if (prompt == null) return '';
+
+  var prefs = await SharedPreferences.getInstance();
+  var promptBase64 = base64Encode(utf8.encode(prompt));
+  var cachedResponse = prefs.getString(promptBase64);
+  if (cachedResponse != null) return cachedResponse;
+
+  String response = await gptApiCall(model: 'gpt-4o', messages: [
+    {'role': 'system', 'content': prompt}
+  ]);
+  prefs.setString(promptBase64, response);
+  return response;
+}
+
 Future<String> generateTitleAndSummaryForMemory(String? memory) async {
   var prompt = '''
     Generate a title and a summary for the following recording chunk of a conversation.

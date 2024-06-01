@@ -17,8 +17,8 @@ Future<String> checkReminderAndSend(String transcript) async {
     String reminder = await executeGptPrompt(prompt);
     if (reminder.isNotEmpty) {
       // Send the reminder as a notification or handle it as needed
-      final timeId = DateTime.now().millisecondsSinceEpoch;
-      createNotification(title: 'Reminder', body: reminder, notificationId: timeId);
+      int timeId = DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
+      createNotification(title: 'Reminder: $reminder', body: reminder, notificationId: timeId);
     }
   }
   return '';
