@@ -47,6 +47,8 @@ Future<MemoryRecord?> memoryCreationBlock(BuildContext context, String transcrip
     ));
     return memory;
   }
+  String reminder = await checkReminderAndSend(transcript);
+  debugPrint('Reminder: $reminder');
   return null;
 }
 
