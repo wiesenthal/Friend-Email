@@ -1,11 +1,11 @@
-import 'package:app_with_wearable/backend/api_requests/api_calls.dart';
-import 'package:app_with_wearable/utils/notification.dart';
+import 'package:friend_private/backend/api_requests/api_calls.dart';
+import 'package:friend_private/utils/notifications.dart';
 
 Future<String> checkReminderAndSend(String transcript) async {
-  const reminderRegex = RegExp(r'\bremind me\b|\bI need to\b', caseSensitive: false);
+  final reminderRegex = RegExp(r'\bremind me\b|\bi need to\b', caseSensitive: false);
   // Check for specific phrases in the transcript
   if (reminderRegex.hasMatch(transcript)) {
-    var prompt = '''
+    String prompt = '''
       Extract a reminder from the following transcript:
       ```
       $transcript
@@ -17,8 +17,8 @@ Future<String> checkReminderAndSend(String transcript) async {
     String reminder = await executeGptPrompt(prompt);
     if (reminder.isNotEmpty) {
       // Send the reminder as a notification or handle it as needed
-      const timeId = new DateTime.now().millisecondsSinceEpoch;
-      createNotification({ title: 'Reminder', body: reminder, id: timeId });
+      final timeId = DateTime.now().millisecondsSinceEpoch;
+      createNotification(title: 'Reminder', body: reminder, notificationId: timeId);
     }
   }
   return '';
