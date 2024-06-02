@@ -369,7 +369,7 @@ class TranscriptWidgetState extends State<TranscriptWidget> {
   _initiateReminderTimer() {
     debugPrint('_initiateReminderTimer');
     if (!SharedPreferencesUtil().enableReminderNotifications) return;
-    _reminderTimer = Timer(const Duration(seconds: 4), () async {
+    _reminderTimer = Timer(const Duration(seconds: 5), () async {
       if (!SharedPreferencesUtil().enableReminderNotifications) return;
       debugPrint('Creating reminder');
       String transcript = reminderOnlyTranscript.trim();

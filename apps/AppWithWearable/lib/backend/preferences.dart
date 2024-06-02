@@ -67,7 +67,7 @@ class SharedPreferencesUtil {
 
   set devModeEnabled(bool value) => saveBool('devModeEnabled', value);
 
-  bool get enableReminderNotifications => getBool('enableReminderNotifications') ?? true;
+  bool get enableReminderNotifications => getBool('enableReminderNotifications') ?? false;
 
   set enableReminderNotifications(bool value) => saveBool('enableReminderNotifications', value);
 
