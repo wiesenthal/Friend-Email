@@ -101,6 +101,22 @@ Future<String> executeGptPrompt(String? prompt) async {
   return response;
 }
 
+Future<String> executeGpt4oPrompt(String? prompt) async {
+  if (prompt == null) return '';
+
+  var prefs = SharedPreferencesUtil();
+  var promptBase64 = base64Encode(utf8.encode(prompt));
+  var cachedResponse = prefs.gptCompletionCache(promptBase64);
+  if (prefs.gptCompletionCache(promptBase64).isNotEmpty) return cachedResponse;
+
+  String response = await gptApiCall(model: 'gpt-4o', messages: [
+    {'role': 'system', 'content': prompt}
+  ]);
+  prefs.setGptCompletionCache(promptBase64, response);
+  debugPrint('executeGptPrompt response: $response');
+  return response;
+}
+
 _getPrevMemoriesStr(List<MemoryRecord> previousMemories) {
   var prevMemoriesStr = MemoryRecord.memoriesToString(previousMemories);
   return prevMemoriesStr.isNotEmpty

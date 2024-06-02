@@ -10,8 +10,6 @@ import '/flutter_flow/flutter_flow_util.dart';
 // Perform actions periodically
 Future<MemoryRecord?> processTranscriptContent(
     BuildContext context, String content, String? audioFileName) async {
-  String reminder = await checkReminderAndSend(content);
-  debugPrint('Reminder: $reminder');
   if (content.isNotEmpty)
     return await memoryCreationBlock(context, content, audioFileName);
   return null;

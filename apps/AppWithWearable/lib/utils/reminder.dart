@@ -1,3 +1,4 @@
+import 'dart:math';
 import 'package:friend_private/backend/api_requests/api_calls.dart';
 import 'package:friend_private/utils/notifications.dart';
 
@@ -14,13 +15,12 @@ Future<String> checkReminderAndSend(String transcript) async {
     ''';
 
     // Call OpenAI to process the extraction
-    String reminder = await executeGptPrompt(prompt);
+    String reminder = await executeGpt4oPrompt(prompt);
     if (reminder.isNotEmpty) {
       // Send the reminder as a notification or handle it as needed
-      int timeId = DateTime.now().millisecondsSinceEpoch & 0xFFFFFFFF;
-      createNotification(title: 'Reminder: $reminder', body: reminder, notificationId: timeId);
+      int randomId = Random().nextInt(0x7FFFFFFF);
+      createNotification(title: 'Reminder: $reminder', body: reminder, notificationId: randomId);
     }
   }
   return '';
 }
-

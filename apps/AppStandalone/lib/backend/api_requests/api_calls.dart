@@ -75,9 +75,11 @@ Future<dynamic> gptApiCall({
     body = jsonEncode(bodyData);
   }
 
-  var response = await makeApiCall(url: url, headers: headers, body: body, method: 'POST');
+  var response =
+      await makeApiCall(url: url, headers: headers, body: body, method: 'POST');
   return extractContentFromResponse(response,
-      isEmbedding: urlSuffix == 'embeddings', isFunctionCalling: tools.isNotEmpty);
+      isEmbedding: urlSuffix == 'embeddings',
+      isFunctionCalling: tools.isNotEmpty);
 }
 
 Future<String> executeGptPrompt(String? prompt) async {
@@ -89,21 +91,6 @@ Future<String> executeGptPrompt(String? prompt) async {
   if (cachedResponse != null) return cachedResponse;
 
   String response = await gptApiCall(model: 'gpt-4-turbo', messages: [
-    {'role': 'system', 'content': prompt}
-  ]);
-  prefs.setString(promptBase64, response);
-  return response;
-}
-
-Future<String> executeGpt40Prompt(String? prompt) async {
-  if (prompt == null) return '';
-
-  var prefs = await SharedPreferences.getInstance();
-  var promptBase64 = base64Encode(utf8.encode(prompt));
-  var cachedResponse = prefs.getString(promptBase64);
-  if (cachedResponse != null) return cachedResponse;
-
-  String response = await gptApiCall(model: 'gpt-4o', messages: [
     {'role': 'system', 'content': prompt}
   ]);
   prefs.setString(promptBase64, response);
@@ -145,22 +132,30 @@ Future<String> requestSummary(List<MemoryRecord> memories) async {
 }
 
 Future<List<double>> getEmbeddingsFromInput(String? input) async {
-  var vector = await gptApiCall(model: 'text-embedding-3-small', urlSuffix: 'embeddings', contentToEmbed: input ?? '');
-  return vector.map<double>((item) => double.tryParse(item.toString()) ?? 0.0).toList();
+  var vector = await gptApiCall(
+      model: 'text-embedding-3-small',
+      urlSuffix: 'embeddings',
+      contentToEmbed: input ?? '');
+  return vector
+      .map<double>((item) => double.tryParse(item.toString()) ?? 0.0)
+      .toList();
 }
 
-Future<dynamic> pineconeApiCall({required String urlSuffix, required String body}) async {
+Future<dynamic> pineconeApiCall(
+    {required String urlSuffix, required String body}) async {
   var url = '${Env.pineconeIndexUrl}/$urlSuffix';
   final headers = {
     'Api-Key': Env.pineconeApiKey,
     'Content-Type': 'application/json',
   };
-  var response = await makeApiCall(url: url, headers: headers, body: body, method: 'POST');
+  var response =
+      await makeApiCall(url: url, headers: headers, body: body, method: 'POST');
   var responseBody = jsonDecode(response?.body ?? '{}');
   return responseBody;
 }
 
-Future<bool> createPineconeVector(List<double>? vectorList, String? structuredMemory, String? id) async {
+Future<bool> createPineconeVector(
+    List<double>? vectorList, String? structuredMemory, String? id) async {
   var body = jsonEncode({
     'vectors': [
       {
@@ -171,7 +166,8 @@ Future<bool> createPineconeVector(List<double>? vectorList, String? structuredMe
     ],
     'namespace': Env.pineconeIndexNamespace
   });
-  var responseBody = await pineconeApiCall(urlSuffix: 'vectors/upsert', body: body);
+  var responseBody =
+      await pineconeApiCall(urlSuffix: 'vectors/upsert', body: body);
   debugPrint('createVectorPinecone response: $responseBody');
   return (responseBody['upserted_count'] ?? 0) > 0;
 }
@@ -189,7 +185,8 @@ Future<List> queryPineconeVectors(List<double>? vectorList) async {
   return (responseBody['matches'])?.map((e) => e['metadata']).toList() ?? [];
 }
 
-Future<List<String>> testRequest(String? memory, String? structuredMemory) async {
+Future<List<String>> testRequest(
+    String? memory, String? structuredMemory) async {
   var responseBody = await gptApiCall(
       model: 'gpt-3.5-turbo',
       messages: [
@@ -206,7 +203,8 @@ Future<List<String>> testRequest(String? memory, String? structuredMemory) async
   return decoded.map<String>((e) => e.toString()).toList();
 }
 
-Future<String?> determineRequiresContext(String lastMessage, List<dynamic> chatHistory) async {
+Future<String?> determineRequiresContext(
+    String lastMessage, List<dynamic> chatHistory) async {
   var tools = [
     {
       "type": "function",
@@ -249,7 +247,8 @@ Future<String?> determineRequiresContext(String lastMessage, List<dynamic> chatH
   return null;
 }
 
-String qaStreamedBody(String context, List<dynamic> chatHistory, void callback) {
+String qaStreamedBody(
+    String context, List<dynamic> chatHistory, void callback) {
   // TODO: if context is empty, should go to a different prompt.
   var prompt = '''
     You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question. 
@@ -277,7 +276,8 @@ String qaStreamedBody(String context, List<dynamic> chatHistory, void callback) 
   return body;
 }
 
-String qaStreamedFullMemories(List<MemoryRecord> memories, List<dynamic> chatHistory, void callback) {
+String qaStreamedFullMemories(
+    List<MemoryRecord> memories, List<dynamic> chatHistory, void callback) {
   var prompt = '''
     You are an assistant for question-answering tasks. Use the list of stored user audio transcript memories to answer the question. 
     If you don't know the answer, just say that you don't know. Use three sentences maximum and keep the answer concise.
