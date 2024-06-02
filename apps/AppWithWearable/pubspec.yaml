@@ -62,6 +62,7 @@ dependencies:
   provider: ^6.1.2
   flutter_foreground_task: ^6.2.0
   mixpanel_flutter: ^2.3.1
+  reminders: ^2.0.0
 
 dependency_overrides:
   http: 1.2.0
