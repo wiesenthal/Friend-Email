@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter/scheduler.dart';
 import 'package:friend_private/backend/api_requests/api_calls.dart';
 import 'package:friend_private/backend/mixpanel.dart';
+import 'package:friend_private/backend/preferences.dart';
 import 'package:friend_private/utils/memories.dart';
 import 'package:friend_private/backend/api_requests/cloud_storage.dart';
 import 'package:friend_private/utils/notifications.dart';
@@ -62,6 +63,8 @@ class TranscriptWidgetState extends State<TranscriptWidget> {
 
   String customWebsocketTranscript = '';
   IOWebSocketChannel? channelCustomWebsocket;
+
+  String reminderOnlyTranscript = '';
 
   Timer? _conversationAdvisorTimer;
   Timer? _reminderTimer;
@@ -128,6 +131,10 @@ class TranscriptWidgetState extends State<TranscriptWidget> {
             data['transcript'];
       });
     }
+
+    reminderOnlyTranscript +=
+        current.values.map((e) => e['transcript']).join(' ');
+    debugPrint('Reminder only transcript: $reminderOnlyTranscript');
 
     // iterate speakers by startTime first
     setState(() {});
@@ -246,6 +253,8 @@ class TranscriptWidgetState extends State<TranscriptWidget> {
         whispersDiarized.isNotEmpty &&
         (whispersDiarized.length > 1 || whispersDiarized[0].isNotEmpty)) {
       _initiateMemoryCreationTimer();
+    }
+    if (reminderOnlyTranscript.trim().isNotEmpty) {
       _initiateReminderTimer();
     }
   }
@@ -359,16 +368,16 @@ class TranscriptWidgetState extends State<TranscriptWidget> {
 
   _initiateReminderTimer() {
     debugPrint('_initiateReminderTimer');
-    _reminderTimer = Timer(const Duration(seconds: 5), () async {
+    if (!SharedPreferencesUtil().enableReminderNotifications) return;
+    _reminderTimer = Timer(const Duration(seconds: 4), () async {
+      if (!SharedPreferencesUtil().enableReminderNotifications) return;
       debugPrint('Creating reminder');
-      String transcript = '';
-      if (customWebsocketTranscript.trim().isNotEmpty) {
-        transcript = customWebsocketTranscript.trim();
-      } else {
-        transcript = _buildDiarizedTranscriptMessage();
-      }
+      String transcript = reminderOnlyTranscript.trim();
       debugPrint('Transcript: \n$transcript');
       await checkReminderAndSend(transcript);
+      setState(() {
+        reminderOnlyTranscript = '';
+      });
     });
   }
 

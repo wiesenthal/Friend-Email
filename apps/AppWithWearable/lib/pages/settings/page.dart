@@ -26,6 +26,8 @@ class _SettingsPageState extends State<SettingsPage> {
   late bool useFriendAPIKeys;
   late bool optInAnalytics;
   late bool devModeEnabled;
+  late bool enableReminderNotifications;
+  
 
   @override
   void initState() {
@@ -39,6 +41,7 @@ class _SettingsPageState extends State<SettingsPage> {
     useFriendAPIKeys = SharedPreferencesUtil().useFriendApiKeys;
     optInAnalytics = SharedPreferencesUtil().optInAnalytics;
     devModeEnabled = SharedPreferencesUtil().devModeEnabled;
+    enableReminderNotifications = SharedPreferencesUtil().enableReminderNotifications;
     super.initState();
   }
 
@@ -152,6 +155,19 @@ class _SettingsPageState extends State<SettingsPage> {
                     },
                     title: const Text(
                       'Developer Mode',
+                      style: TextStyle(color: Colors.white),
+                    ),
+                  ),
+                  SwitchListTile(
+                    value: enableReminderNotifications,
+                    activeColor: Colors.deepPurple,
+                    onChanged: (v) {
+                      setState(() {
+                        enableReminderNotifications = v;
+                      });
+                    },
+                    title: const Text(
+                      'Enable Reminder Notifications',
                       style: TextStyle(color: Colors.white),
                     ),
                   ),
@@ -388,6 +404,7 @@ class _SettingsPageState extends State<SettingsPage> {
     prefs.gcpBucketName = gcpBucketNameController.text.trim();
     prefs.optInAnalytics = optInAnalytics;
     prefs.devModeEnabled = devModeEnabled;
+    prefs.enableReminderNotifications = enableReminderNotifications;
 
     optInAnalytics ? MixpanelManager().optInTracking() : MixpanelManager().optOutTracking();
 

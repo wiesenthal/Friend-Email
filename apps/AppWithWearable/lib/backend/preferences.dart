@@ -67,6 +67,10 @@ class SharedPreferencesUtil {
 
   set devModeEnabled(bool value) => saveBool('devModeEnabled', value);
 
+  bool get enableReminderNotifications => getBool('enableReminderNotifications') ?? true;
+
+  set enableReminderNotifications(bool value) => saveBool('enableReminderNotifications', value);
+
   List<Message> get chatMessages {
     final List<String> messages = getStringList('messages') ?? [];
     return messages.map((e) => Message.fromJson(jsonDecode(e))).toList();
